@@ -1,6 +1,5 @@
 library(shiny)
 library(ggplot2)
-require(rCharts)
 
 cars <- mtcars
 cars$names <- rownames(mtcars)
