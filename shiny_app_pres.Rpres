@@ -1,0 +1,103 @@
+Exploring Mtcars Dataset
+========================================================
+author: L.P.
+date: `r date()`
+transition: rotate
+
+Main Goal
+========================================================
+
+- Perform an exploratory data analysis on the mtcars dataset
+- Compare an external observation with the existing dataset
+- Introduce tools that can be used to deal with other datasets and other types of analyses
+
+Mtcars Dataset
+========================================================
+
+The dataset has `r dim(mtcars)[1]` car make and model observations with `r dim(mtcars)[2]` variables,
+including:
+- Miles/(US) gallon (mpg)
+- Weight (lb/1000) (wt)
+- Gross horsepower (hp)
+- Transmission type (am: 0 = auto, 1 = manual)
+- Number of cylinders (cyl)
+
+```{r}
+head(mtcars[,c(1,2,4,6,9)],1)
+```
+
+Application Inputs and Outputs
+=======================================================
+
+Inputs:
+- Choose data points, car make and models, by clicking on checkboxes
+- Choose one out of six types of analyses performed on the data points
+- Optional: Add or erase an external observation ('my car')
+by hitting the Submit or Clear button
+
+***
+
+Outputs:
+- A boxplot or a scatterplot with one or two regression lines
+- Description under the plot with values of regression line intercept(s) and slope(s) when appropriate.
+- Table displaying the data points with the external observation 'my car', if included.
+
+
+Example and Future Directions
+========================================================
+left: 35%
+width: 1920
+height: 1080
+
+```{r, echo=FALSE, height="3000px"}
+library(ggplot2)
+coef2 <- summary(lm(mpg ~ wt + am + am*wt, mtcars))$coef
+mycar <- data.frame(
+                mpg = 20, 
+                cyl = 6,
+                disp = NA,
+                hp = 300, 
+                drat = NA,
+                wt = 2.5, 
+                qsec = NA,
+                vs = NA,
+                am = 0, 
+                gear = NA,
+                carb = NA,
+                names = "my car"
+)
+col <- "seagreen4"
+sh <- 18
+sz <- 9
+g <- ggplot(mtcars, aes(wt, mpg)) 
+        g <- g + geom_hline(yintercept = mean(subset(mtcars,am==0)$mpg), colour = "blue", linetype = 2, size = 2)
+        g <- g + geom_hline(yintercept = mean(subset(mtcars,am==1)$mpg), colour = "orange", linetype = 2, size = 2 )
+        g <- g + geom_point(aes(color=factor(am)), size = 10)   
+        g <- g + scale_colour_manual( values = c("blue", "orange")) 
+        g <- g + geom_abline(intercept = coef2[1], slope = coef2[2], colour = "blue", size = 2 )
+        g <- g + geom_abline(intercept = coef2[1]+coef2[3], slope = coef2[2]+coef2[4], colour = "orange", size = 2 )
+        g <- g + labs(x = "Weight ( x1000 lb)", y = "Miles/(US) gallon")
+        g <- g + theme(text = element_text(size=45),
+                       legend.position = "none") 
+        g <- g + geom_point(data = mycar, aes(wt, mpg), 
+            size = sz, colour = col, shape = sh)
+g
+```
+<small>
+```{r, eval=FALSE}
+lm(mpg ~ wt + am + am*wt, mtcars)
+```
+</small>
+
+
+***
+
+- <small> Scatterplot of mpg vs. weight is shown with two regression lines: 
+automatic (blue) and manual (orange) transmission.</small>
+- <small> Dotted lines: automatic and manual mpg means, disregarding car weight.</small>
+- <small> Disregarding weight, the manual transmission performs better (7.3 mpg above the automatic). Including weight, 
+manual transmission has better mpg for lighter cars, automatic is better for heavier cars.</small>
+- <small> Similar analysis can be performed for other types of plots and datasets.</small>
+
+
+
